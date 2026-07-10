@@ -1,5 +1,4 @@
 import { Link, Outlet } from 'react-router';
-import { Timer } from 'lucide-react';
 import { ResetDayButton } from '@/timers/components/ResetDayButton';
 import { DownloadCsvButton } from '@/timers/components/DownloadCsvButton';
 
@@ -9,7 +8,6 @@ export const TimersLayout = () => (
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-3">
         <Link to="/" className="flex items-center gap-2 font-semibold">
-          <Timer className="size-5" />
           <span>Timers del día</span>
         </Link>
         <div className="flex items-center gap-2">

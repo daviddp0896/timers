@@ -26,6 +26,7 @@ export const CATEGORIES: Category[] = [
       { id: 'rutina-noche', name: 'Rutina noche' },
       { id: 'laila', name: 'Laila' },
       { id: 'lectura', name: 'Lectura' },
+      { id: 'en-cama', name: 'En cama' },
     ],
   },
   {
@@ -128,6 +129,21 @@ export const CATEGORIES: Category[] = [
       { id: 'ocio', name: 'Ocio' },
       { id: 'otros', name: 'Otros' },
       { id: 'proceso', name: 'Proceso' },
+    ],
+  },
+  {
+    id: 'otros-categoria',
+    name: 'Otros',
+    color: {
+      bar: 'bg-slate-500',
+      soft: 'bg-slate-50 dark:bg-slate-950/40',
+      text: 'text-slate-600 dark:text-slate-400',
+      border: 'border-slate-200 dark:border-slate-900',
+      ring: 'ring-slate-500',
+    },
+    activities: [
+      { id: 'otros-actividad', name: 'Otros' },
+      { id: 'procesos', name: 'Procesos' },
     ],
   },
 ];
