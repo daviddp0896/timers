@@ -38,7 +38,7 @@ export const ActivityTimer = ({ activity, color, now }: Props) => {
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-4 rounded-xl border bg-card p-4 transition-colors',
+        'flex flex-col gap-3 rounded-xl border bg-card p-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:gap-4',
         isRunning ? cn(color.soft, color.border) : 'border-border',
       )}
     >
@@ -49,10 +49,10 @@ export const ActivityTimer = ({ activity, color, now }: Props) => {
             isRunning ? cn(color.bar, 'animate-pulse') : 'bg-muted-foreground/30',
           )}
         />
-        <span className="truncate font-medium">{activity.name}</span>
+        <span className="min-w-0 font-medium break-words">{activity.name}</span>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
         <span
           className={cn(
             'font-mono text-lg tabular-nums',
