@@ -1,0 +1,10 @@
+I wanto to create a timer for all the activities that i do during the day
+to be able to be more productive, solo i want a page with all the catogories
+that are on the file categories.csv and when click the catogories it shows the
+diferent timers inside that correspond to the activities i want to monitor,
+sabe the data on the cache during the day and add a button where i can restart
+all the timers for the new day, use a clean, modern design with diferent colors, 
+alaso add a button that generates a csv with al the activities and the total time,
+but keep it on minutes, not hours, an then it download the file. Generate a plan
+to do this before doing it, and add the plan on the promt folder where is this promp,
+also ask me question that are missing or not clear.
