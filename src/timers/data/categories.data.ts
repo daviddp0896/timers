@@ -1,5 +1,13 @@
 import type { Category } from '@/timers/interfaces/timer.interface';
 
+// The general "unclassified" timer — a pseudo-activity that belongs to no category.
+// It counts time that isn't assigned to any activity.
+export const GENERAL_ID = '__general__';
+export const GENERAL_REPORT = {
+  category: 'Sin clasificar',
+  activity: 'Tiempo sin clasificar',
+};
+
 // Static category → activity data parsed from promt/categories.csv (Rule 21).
 // Color classes are written as full literals so Tailwind's scanner keeps them.
 export const CATEGORIES: Category[] = [

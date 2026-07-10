@@ -1,27 +1,38 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { GENERAL_ID } from '@/timers/data/categories.data';
 
 // Global timer state, persisted to localStorage so the day's data survives reloads
-// (Rule 4). Only one activity runs at a time.
+// (Rule 4). Exactly one entity counts at a time: a category activity, the general
+// (unclassified) timer, or nothing.
 interface TimersState {
   // Committed seconds per activity id (does NOT include the live running delta).
+  // The general timer is stored here under GENERAL_ID.
   elapsed: Record<string, number>;
-  // The activity currently running, or null if none.
+  // The entity currently running (an activity id, GENERAL_ID, or null).
   runningId: string | null;
-  // Epoch ms when the running activity was started.
+  // Epoch ms when the running entity was started.
   startedAt: number | null;
+  // Whether the general timer is enabled. When on, it counts during any moment no
+  // category activity is running (auto-pausing / auto-resuming around them).
+  generalOn: boolean;
 
-  // Start/stop an activity. Starting one commits and pauses any other (one-at-a-time).
+  // Start/stop a category activity. Starting commits & pauses whatever ran; stopping
+  // resumes the general timer when it is enabled (one-at-a-time).
   toggle: (id: string) => void;
+  // Enable/disable the general timer via its Play button.
+  toggleGeneral: () => void;
   // Pause whatever is running, committing its elapsed time.
   stop: () => void;
-  // Reset every activity back to zero for a new day.
+  // Clear a single activity's time (restart in place if it is running).
+  resetActivity: (id: string) => void;
+  // Reset every activity + the general timer back to zero for a new day.
   resetAll: () => void;
-  // Live elapsed seconds for an activity, including the running delta at `now`.
+  // Live elapsed seconds for an entity, including the running delta at `now`.
   elapsedOf: (id: string, now: number) => number;
 }
 
-// Commits the running activity's delta into `elapsed` and clears the running flags.
+// Commits the running entity's delta into `elapsed` and clears the running flags.
 const commit = (state: TimersState, now: number): Partial<TimersState> => {
   if (state.runningId === null || state.startedAt === null) return {};
   const delta = Math.max(0, (now - state.startedAt) / 1000);
@@ -41,24 +52,59 @@ export const useTimersStore = create<TimersState>()(
       elapsed: {},
       runningId: null,
       startedAt: null,
+      generalOn: false,
 
       toggle: (id) => {
         const state = get();
         const now = Date.now();
         const wasRunning = state.runningId === id;
-        // Always commit the current running timer first...
+        // Commit the currently running entity first (activity or general)...
         const committed = commit(state, now);
-        // ...then start this one, unless it was the one we just paused.
-        set({
-          ...committed,
-          runningId: wasRunning ? null : id,
-          startedAt: wasRunning ? null : now,
-        });
+
+        if (wasRunning) {
+          // Pausing this activity → resume the general timer if it is enabled.
+          set({
+            ...committed,
+            runningId: state.generalOn ? GENERAL_ID : null,
+            startedAt: state.generalOn ? now : null,
+          });
+        } else {
+          // Starting this activity → it counts, general auto-pauses.
+          set({ ...committed, runningId: id, startedAt: now });
+        }
+      },
+
+      toggleGeneral: () => {
+        const state = get();
+        const now = Date.now();
+
+        if (state.generalOn) {
+          // Turn the general timer off, committing it if it was counting.
+          const committed = state.runningId === GENERAL_ID ? commit(state, now) : {};
+          set({ ...committed, generalOn: false });
+        } else if (state.runningId === null) {
+          // Enable and start counting immediately (nothing else is running).
+          set({ generalOn: true, runningId: GENERAL_ID, startedAt: now });
+        } else {
+          // Enable, but stay paused while a category activity is running.
+          set({ generalOn: true });
+        }
       },
 
       stop: () => set((state) => commit(state, Date.now())),
 
-      resetAll: () => set({ elapsed: {}, runningId: null, startedAt: null }),
+      resetActivity: (id) => {
+        const state = get();
+        if (state.runningId === id) {
+          // Restart in place: zero it but keep it running from now.
+          set({ elapsed: { ...state.elapsed, [id]: 0 }, startedAt: Date.now() });
+        } else {
+          set({ elapsed: { ...state.elapsed, [id]: 0 } });
+        }
+      },
+
+      resetAll: () =>
+        set({ elapsed: {}, runningId: null, startedAt: null, generalOn: false }),
 
       elapsedOf: (id, now) => {
         const state = get();

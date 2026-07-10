@@ -1,4 +1,4 @@
-import { Pause, Play } from 'lucide-react';
+import { Pause, Play, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { formatDuration } from '@/lib/time';
@@ -13,6 +13,7 @@ interface Props {
 
 export const ActivityTimer = ({ activity, color, now }: Props) => {
   const toggle = useTimersStore((state) => state.toggle);
+  const resetActivity = useTimersStore((state) => state.resetActivity);
   const isRunning = useTimersStore((state) => state.runningId === activity.id);
   const seconds = useTimersStore((state) => state.elapsedOf(activity.id, now));
 
@@ -42,6 +43,15 @@ export const ActivityTimer = ({ activity, color, now }: Props) => {
         >
           {formatDuration(seconds)}
         </span>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-muted-foreground"
+          onClick={() => resetActivity(activity.id)}
+          aria-label={`Reiniciar ${activity.name}`}
+        >
+          <RotateCcw className="size-4" />
+        </Button>
         <Button
           size="icon"
           variant={isRunning ? 'default' : 'secondary'}

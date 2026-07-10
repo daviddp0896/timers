@@ -2,8 +2,12 @@ import { Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { buildActivitiesCsv, downloadCsv } from '@/lib/csv';
-import { secondsToMinutes } from '@/lib/time';
-import { ALL_ACTIVITIES } from '@/timers/data/categories.data';
+import { secondsToWholeMinutes } from '@/lib/time';
+import {
+  ALL_ACTIVITIES,
+  GENERAL_ID,
+  GENERAL_REPORT,
+} from '@/timers/data/categories.data';
 import { useTimersStore } from '@/timers/store/timers.store';
 import type { ActivityReportRow } from '@/timers/interfaces/timer.interface';
 
@@ -23,8 +27,15 @@ export const DownloadCsvButton = () => {
     const rows: ActivityReportRow[] = ALL_ACTIVITIES.map(({ category, activity }) => ({
       category: category.name,
       activity: activity.name,
-      minutes: secondsToMinutes(elapsedOf(activity.id, now)),
+      minutes: secondsToWholeMinutes(elapsedOf(activity.id, now)),
     }));
+
+    // Append the general "unclassified" time as its own row.
+    rows.push({
+      category: GENERAL_REPORT.category,
+      activity: GENERAL_REPORT.activity,
+      minutes: secondsToWholeMinutes(elapsedOf(GENERAL_ID, now)),
+    });
 
     downloadCsv(`actividades-${todayStamp()}.csv`, buildActivitiesCsv(rows));
     toast.success('CSV generado y descargado');

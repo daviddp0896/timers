@@ -1,5 +1,6 @@
 import { CATEGORIES } from '@/timers/data/categories.data';
 import { CategoryCard } from '@/timers/components/CategoryCard';
+import { GeneralTimerCard } from '@/timers/components/GeneralTimerCard';
 import { useNow } from '@/timers/hooks/useNow';
 
 export const CategoriesPage = () => {
@@ -7,6 +8,8 @@ export const CategoriesPage = () => {
 
   return (
     <div className="space-y-6">
+      <GeneralTimerCard now={now} />
+
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Categorías</h1>
         <p className="text-muted-foreground">

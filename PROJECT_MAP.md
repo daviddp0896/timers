@@ -70,7 +70,8 @@ timers/
         ├── hooks/useNow.tsx                 1s tick while a timer runs
         ├── components/
         │   ├── CategoryCard.tsx             colored card → category, live total
-        │   ├── ActivityTimer.tsx            one activity row: elapsed + start/pause
+        │   ├── ActivityTimer.tsx            one activity row: elapsed + start/pause + reset
+        │   ├── GeneralTimerCard.tsx         top "Tiempo sin clasificar" timer + play/pause
         │   ├── ResetDayButton.tsx           AlertDialog confirm → resetAll()
         │   └── DownloadCsvButton.tsx        builds + downloads the daily CSV
         ├── layouts/TimersLayout.tsx         header (title + controls) + <Outlet/>
@@ -93,7 +94,7 @@ into `categories.data.ts`.
 | `lib/time.ts` | Duration formatting + seconds→minutes | — | timers components, csv button |
 | `lib/csv.ts` | Build + download the daily CSV | time, interfaces | DownloadCsvButton |
 | `timers/data/categories.data.ts` | The 7 categories / 28 activities + colors | interfaces | store consumers, pages |
-| `timers/store/timers.store.ts` | Timer state, one-at-a-time, persist | zustand/persist | all timer components |
+| `timers/store/timers.store.ts` | Timer state, one-at-a-time, general timer, per-activity + day reset, persist | zustand/persist | all timer components |
 | `timers/hooks/useNow.tsx` | 1s tick while running | store | pages |
 | `timers/pages/*` | Category grid + activity list | store, components, data | app.router |
 | `timers/components/*` | Cards, timer rows, reset/download buttons | store, ui, lib | pages, layout |
@@ -121,6 +122,11 @@ into `categories.data.ts`.
 
 ## Key Patterns
 
+- **One entity counts at a time** — a category activity, the general timer, or nothing.
+  The store commits the running one's delta on every transition (see `timers.store.ts`).
+- **General (unclassified) timer** — enabled by its Play button (`generalOn`); it counts
+  whenever enabled and no category runs, auto-pausing/resuming around activities. Exported
+  in the CSV as the `Sin clasificar` row.
 - **Action layer is the data-source boundary** — only `actions/` import `timersApi` (Rule 1, 34).
 - **Hooks wrap actions with react-query** — always set `staleTime`, include every dep in `queryKey` (Rule 3).
 - **URL as state** for filters/pagination via `useSearchParams` (Rule 5).

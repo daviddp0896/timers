@@ -13,6 +13,8 @@ export const formatDuration = (totalSeconds: number): string => {
   return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
 };
 
-// Converts seconds to minutes rounded to one decimal (used by the CSV export).
-export const secondsToMinutes = (totalSeconds: number): number =>
-  Math.round((totalSeconds / 60) * 10) / 10;
+// Converts seconds to WHOLE minutes for the CSV export: < 30s of a minute rounds
+// down, >= 30s rounds up (e.g. 29s → 0, 30s → 1, 90s → 2). Keeps the report free
+// of partial minutes.
+export const secondsToWholeMinutes = (totalSeconds: number): number =>
+  Math.round(Math.max(0, totalSeconds) / 60);
