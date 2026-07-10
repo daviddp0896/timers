@@ -1,7 +1,9 @@
-import { Pause, Play, RotateCcw } from 'lucide-react';
+import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { formatDuration } from '@/lib/time';
+import { GENERAL_ID } from '@/timers/data/categories.data';
 import { useTimersStore } from '@/timers/store/timers.store';
 import type { Activity, CategoryColor } from '@/timers/interfaces/timer.interface';
 
@@ -14,8 +16,24 @@ interface Props {
 export const ActivityTimer = ({ activity, color, now }: Props) => {
   const toggle = useTimersStore((state) => state.toggle);
   const resetActivity = useTimersStore((state) => state.resetActivity);
+  const undoReset = useTimersStore((state) => state.undoReset);
+  const addMinute = useTimersStore((state) => state.addMinute);
+  const subtractMinute = useTimersStore((state) => state.subtractMinute);
   const isRunning = useTimersStore((state) => state.runningId === activity.id);
   const seconds = useTimersStore((state) => state.elapsedOf(activity.id, now));
+  // ± transfer whole minutes with the unclassified timer, so each side must hold ≥60s
+  // of live time (base + running delta), matching what the transfer can actually move.
+  const canAdd = useTimersStore((state) => state.elapsedOf(GENERAL_ID, now) >= 60);
+  const canSubtract = useTimersStore((state) => state.elapsedOf(activity.id, now) >= 60);
+
+  // Reset dumps this activity's time into the unclassified timer — offer a one-tap undo.
+  const handleReset = () => {
+    resetActivity(activity.id);
+    toast(`${activity.name} reiniciada`, {
+      description: 'Su tiempo se movió a “sin clasificar”.',
+      action: { label: 'Deshacer', onClick: () => undoReset() },
+    });
+  };
 
   return (
     <div
@@ -47,7 +65,27 @@ export const ActivityTimer = ({ activity, color, now }: Props) => {
           size="icon"
           variant="ghost"
           className="text-muted-foreground"
-          onClick={() => resetActivity(activity.id)}
+          onClick={() => subtractMinute(activity.id)}
+          disabled={!canSubtract}
+          aria-label={`Quitar un minuto a ${activity.name}`}
+        >
+          <Minus className="size-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-muted-foreground"
+          onClick={() => addMinute(activity.id)}
+          disabled={!canAdd}
+          aria-label={`Añadir un minuto a ${activity.name}`}
+        >
+          <Plus className="size-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-muted-foreground"
+          onClick={handleReset}
           aria-label={`Reiniciar ${activity.name}`}
         >
           <RotateCcw className="size-4" />

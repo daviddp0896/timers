@@ -71,7 +71,9 @@ timers/
         ├── components/
         │   ├── CategoryCard.tsx             colored card → category, live total
         │   ├── ActivityTimer.tsx            one activity row: elapsed + start/pause + reset
-        │   ├── GeneralTimerCard.tsx         top "Tiempo sin clasificar" timer + play/pause
+        │   ├── DayControls.tsx              green start/finish-day toggle + pause button
+        │   ├── TimeLeftCard.tsx             remaining / total registered / over-budget (24h)
+        │   ├── GeneralTimerCard.tsx         top "Tiempo sin clasificar" timer + +1 min
         │   ├── ResetDayButton.tsx           AlertDialog confirm → resetAll()
         │   └── DownloadCsvButton.tsx        builds + downloads the daily CSV
         ├── layouts/TimersLayout.tsx         header (title + controls) + <Outlet/>
@@ -124,9 +126,27 @@ into `categories.data.ts`.
 
 - **One entity counts at a time** — a category activity, the general timer, or nothing.
   The store commits the running one's delta on every transition (see `timers.store.ts`).
-- **General (unclassified) timer** — enabled by its Play button (`generalOn`); it counts
-  whenever enabled and no category runs, auto-pausing/resuming around activities. Exported
+- **General (unclassified) timer** — the day is started by the green `DayControls` button
+  (`toggleDay` → `generalOn`), which then toggles to "Finalizar día" (pauses every timer).
+  The day also auto-starts the first time any activity runs. Once enabled the general timer
+  counts whenever no category runs. The `Pausar` button (`pauseToGeneral`) pauses the running
+  activity and resumes the unclassified timer — disabled once it is already counting. Exported
   in the CSV as the `Sin clasificar` row.
+- **Reset moves time, never deletes it** — an activity's reset button (`resetActivity`) transfers
+  its accumulated time into the unclassified timer and zeroes the activity. Resetting **pauses**
+  the activity (the unclassified timer resumes if the day is on).
+- **±1 minute transfers with the unclassified timer** — each activity has `+`/`−` buttons.
+  `addMinute` moves 60s from the unclassified timer into the activity; `subtractMinute` moves 60s
+  back. Both commit the live running delta first (so they act on true on-screen time) and are
+  bounded (never negative) so the day's total time is conserved — which is why the unclassified
+  timer needs no `+` button. Buttons disable when the giving side holds < 60s of live time.
+- **Undo on reset** — `resetActivity` snapshots the pre-reset state into a transient `undo` buffer;
+  the reset toast offers "Deshacer" (`undoReset`). `undo` is excluded from persistence via `partialize`.
+- **Conservation is visible** — `TimeLeftCard` shows remaining, total registered, and an over-budget
+  (> 24h) state, so corrections are seen to redistribute time, never create or destroy it.
+- **Cross-tab sync** — a `storage` listener calls `persist.rehydrate()` so multiple tabs converge
+  on the same state instead of double-counting.
+- **Time left of day** — `TimeLeftCard` shows `24h − totalElapsedSeconds` across all timers.
 - **Action layer is the data-source boundary** — only `actions/` import `timersApi` (Rule 1, 34).
 - **Hooks wrap actions with react-query** — always set `staleTime`, include every dep in `queryKey` (Rule 3).
 - **URL as state** for filters/pagination via `useSearchParams` (Rule 5).

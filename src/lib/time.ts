@@ -13,6 +13,14 @@ export const formatDuration = (totalSeconds: number): string => {
   return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
 };
 
+// Formats a duration in seconds as "Xh YYm" — used for the day's remaining time.
+export const formatHoursMinutes = (totalSeconds: number): string => {
+  const safe = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safe / 3600);
+  const minutes = Math.floor((safe % 3600) / 60);
+  return `${hours}h ${minutes.toString().padStart(2, '0')}m`;
+};
+
 // Converts seconds to WHOLE minutes for the CSV export: < 30s of a minute rounds
 // down, >= 30s rounds up (e.g. 29s → 0, 30s → 1, 90s → 2). Keeps the report free
 // of partial minutes.

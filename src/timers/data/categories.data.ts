@@ -74,7 +74,6 @@ export const CATEGORIES: Category[] = [
       { id: 'estudio-code', name: 'Estudio Code' },
       { id: 'estudio-video', name: 'Estudio Video' },
       { id: 'estudio-psi', name: 'Estudio Psi' },
-      { id: 'escuela', name: 'Escuela' },
     ],
   },
   {
@@ -93,6 +92,7 @@ export const CATEGORIES: Category[] = [
       { id: 'proyectos-personales', name: 'Proyectos personales' },
       { id: 'musica', name: 'Música' },
       { id: 'trabajo-pagado', name: 'Trabajo Pagado' },
+      { id: 'escuela', name: 'Escuela' },
     ],
   },
   {

@@ -1,6 +1,4 @@
-import { Pause, Play, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { formatDuration } from '@/lib/time';
 import { GENERAL_ID } from '@/timers/data/categories.data';
 import { useTimersStore } from '@/timers/store/timers.store';
@@ -10,13 +8,13 @@ interface Props {
 }
 
 // The general "unclassified" timer, pinned to the top of the categories page.
-// Counts whenever it is enabled and no category activity is running.
+// Counts whenever the day is started and no category activity is running. It is
+// controlled by the DayControls buttons above it (display only — no buttons). Its
+// minutes are added/removed indirectly via the activities' +/- buttons.
 export const GeneralTimerCard = ({ now }: Props) => {
   const generalOn = useTimersStore((state) => state.generalOn);
   const isCounting = useTimersStore((state) => state.runningId === GENERAL_ID);
   const seconds = useTimersStore((state) => state.elapsedOf(GENERAL_ID, now));
-  const toggleGeneral = useTimersStore((state) => state.toggleGeneral);
-  const resetActivity = useTimersStore((state) => state.resetActivity);
 
   return (
     <div
@@ -41,37 +39,19 @@ export const GeneralTimerCard = ({ now }: Props) => {
               ? 'Contando el tiempo libre'
               : generalOn
                 ? 'En pausa (hay una actividad activa)'
-                : 'Presiona play para empezar el día'}
+                : 'Inicia el día para empezar a contar'}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span
-          className={cn(
-            'font-mono text-2xl tabular-nums',
-            isCounting ? 'text-slate-700 dark:text-slate-200' : 'text-muted-foreground',
-          )}
-        >
-          {formatDuration(seconds)}
-        </span>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="text-muted-foreground"
-          onClick={() => resetActivity(GENERAL_ID)}
-          aria-label="Reiniciar tiempo sin clasificar"
-        >
-          <RotateCcw className="size-4" />
-        </Button>
-        <Button
-          size="icon"
-          onClick={toggleGeneral}
-          aria-label={generalOn ? 'Pausar tiempo sin clasificar' : 'Iniciar tiempo sin clasificar'}
-        >
-          {generalOn ? <Pause className="size-4" /> : <Play className="size-4" />}
-        </Button>
-      </div>
+      <span
+        className={cn(
+          'font-mono text-2xl tabular-nums',
+          isCounting ? 'text-slate-700 dark:text-slate-200' : 'text-muted-foreground',
+        )}
+      >
+        {formatDuration(seconds)}
+      </span>
     </div>
   );
 };
