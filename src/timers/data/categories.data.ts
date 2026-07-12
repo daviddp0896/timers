@@ -127,8 +127,6 @@ export const CATEGORIES: Category[] = [
       { id: 'redes', name: 'Redes' },
       { id: 'siesta', name: 'Siesta' },
       { id: 'ocio', name: 'Ocio' },
-      { id: 'otros', name: 'Otros' },
-      { id: 'proceso', name: 'Proceso' },
     ],
   },
   {
@@ -143,7 +141,7 @@ export const CATEGORIES: Category[] = [
     },
     activities: [
       { id: 'otros-actividad', name: 'Otros' },
-      { id: 'procesos', name: 'Procesos' },
+      { id: 'procesos', name: 'Proceso' },
     ],
   },
 ];
