@@ -6,20 +6,37 @@ const escapeCell = (value: string | number): string => {
   return `"${str.replace(/"/g, '""')}"`;
 };
 
-// Builds the CSV text for the daily report: header, one row per activity, TOTAL row.
-export const buildActivitiesCsv = (rows: ActivityReportRow[]): string => {
-  const header = ['Categoria', 'Actividad', 'Minutos'];
-  const total = rows.reduce((sum, row) => sum + row.minutes, 0);
+// A computed column of the summary block below the activities (sums, unclassified time).
+export interface CsvSummaryColumn {
+  label: string;
+  minutes: number;
+}
 
+// Builds the CSV text for the daily report, laid out horizontally: one column per
+// activity, in the order the caller passes them. Row 1 is the category of each
+// column, row 2 the activity name, row 3 the minutes. The summary columns go in
+// their own block below, separated by a blank line, with the same label/minutes shape.
+export const buildActivitiesCsv = (
+  rows: ActivityReportRow[],
+  summary: CsvSummaryColumn[] = [],
+): string => {
   const lines = [
-    header.map(escapeCell).join(','),
-    ...rows.map((row) =>
-      [row.category, row.activity, row.minutes].map(escapeCell).join(','),
-    ),
-    ['TOTAL', '', Math.round(total * 10) / 10].map(escapeCell).join(','),
+    rows.map((row) => row.category),
+    rows.map((row) => row.activity),
+    rows.map((row) => row.minutes),
   ];
 
-  return lines.join('\r\n');
+  if (summary.length > 0) {
+    lines.push(
+      [],
+      summary.map((column) => column.label),
+      summary.map((column) => column.minutes),
+    );
+  }
+
+  return lines
+    .map((line) => line.map(escapeCell).join(','))
+    .join('\r\n');
 };
 
 // Triggers a browser download of the given text as a .csv file.

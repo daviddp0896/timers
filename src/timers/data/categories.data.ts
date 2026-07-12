@@ -146,6 +146,48 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
+// Column order of the exported CSV — mirrors public/orden.csv, which is the
+// column layout of the spreadsheet the report is pasted into. It does not match
+// the order the activities are declared in above (e.g. 'escuela' sits next to
+// the Estudio activities, 'en-cama' goes last), so it is kept as its own list.
+export const CSV_ACTIVITY_ORDER: string[] = [
+  'rutina-manana',
+  'rutina-noche',
+  'laila',
+  'lectura',
+  'desayuno',
+  'comida',
+  'bano',
+  'm',
+  'regadera',
+  'estudio-code',
+  'estudio-video',
+  'estudio-psi',
+  'escuela',
+  'creacion-video',
+  'proyecto-pavimento',
+  'proyectos-personales',
+  'musica',
+  'trabajo-pagado',
+  'padel-tenis',
+  'correr',
+  'fuerza',
+  'estiramiento',
+  'tele',
+  'redes',
+  'siesta',
+  'ocio',
+  'otros-actividad',
+  'procesos',
+  'en-cama',
+];
+
+// Activities whose minutes are summed into the extra "Estudio Code+Video" column.
+export const ESTUDIO_SUM_IDS: string[] = ['estudio-code', 'estudio-video'];
+
+// Category whose activities are summed into the extra "Ejercicio" column.
+export const EJERCICIO_CATEGORY_ID = 'ejercicio';
+
 // Flat lookup helpers derived once at module level.
 export const CATEGORY_BY_ID = new Map(CATEGORIES.map((c) => [c.id, c]));
 

@@ -20,8 +20,9 @@ export interface Category {
   activities: Activity[];
 }
 
-// One exported row of the CSV report.
+// One exported entry of the CSV report (rendered as a column, see lib/csv.ts).
 export interface ActivityReportRow {
+  activityId: string;
   category: string;
   activity: string;
   minutes: number;
